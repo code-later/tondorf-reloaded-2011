@@ -62,7 +62,7 @@ end
 
 # require "grashopper"
 
-Grasshopper.join("gambit.local:3000", "basti") do
+Grasshopper.join("localhost:3000", "basti") do
   world
   
   run!

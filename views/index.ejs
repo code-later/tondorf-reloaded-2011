@@ -44,28 +44,65 @@
         this.name = name;
         this.color = possible_colors[Math.random(possible_colors.length)];
         
+        
+        /// moving
+        
         this.move = function(x, y, direction) {
-          //var path_to_animate_along = paper.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
-          // path_to_animate_along.hide();
-          // direction = Raphael.deg(direction);
-          if(this.current_direction!=direction) { this.monster_img.rotate(direction); }
+          this.draw_path(x,y,direction);
+          this.animate_monster(x,y,direction);
+          this.set_current_values(x,y,direction);
+          console.log(this.name + " moved to "+this.current_x+"/"+this.current_y+" and looking to "+this.current_direction);
+        }
+        
+        this.draw_path = function(x,y,direction) {
+          var path_to_animate_along = paper.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
+        }
+        
+        this.animate_monster = function(x,y,direction) {
+          if(this.current_direction!=direction) {
+            this.monster_img.rotate(direction);
+            this.monster_bg.rotate(direction);
+          }
           this.monster_img.animate({x:(x-(this.monster_image_width/2)), y:(y-(this.monster_image_width/2))}, 100);
           this.monster_name.animate({x:x, y:y}, 100);
+          this.monster_bg.animate({x:x-(16/2), y:y-(24/2)}, 100);
+        }
+        
+        this.set_current_values = function(x,y,direction) {
           this.current_x = x;
           this.current_y = y;
           this.current_direction = direction;
-          // console.log(this.name + " moved to "+this.current_x+"/"+this.current_y+" and looking to "+this.current_direction);
         }
         
-        this.initial_draw = function() {
-          this.monster_img = paper.set();
+        
+        // initialization
+        
+        this.init_monster_bg = function() {
+          this.monster_bg = paper.rect(x-(this.monster_image_width/2)-10, y-(this.monster_image_width/2)-12, 20, 24);
+          this.monster_bg.attr("fill", "red");
+          this.monster_bg.attr("stroke", "white");
+          this.monster_bg.rotate(direction);
+        }
+        
+        this.init_monster_img = function() {
           this.monster_img = paper.image("panzer.png", x-(this.monster_image_width/2), y-(this.monster_image_width/2), this.monster_image_width, this.monster_image_width);
-          this.monster_name = paper.text(x, y, this.name);
           this.monster_img.rotate(direction);
+        }
+        
+        this.init_monster_name = function() {
+          this.monster_name = paper.text(x, y, this.name);
           this.monster_name.rotate(direction);
           this.monster_name.attr("fill", this.color);
           this.monster_name.attr("font", '14px "Arial"');
         }
+        
+        this.initial_draw = function() {
+          this.init_monster_bg();
+          this.init_monster_img();
+          this.init_monster_name();
+          this.move(this.current_x, this.current_y);
+        }
+        
         
         this.initial_draw();
       }
