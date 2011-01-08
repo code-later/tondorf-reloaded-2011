@@ -4,7 +4,7 @@ var app         = require('express').createServer(),
     express     = require('express');
     grasshopper = require('./lib/grasshopper');
 
-var game = new grasshopper.Game();
+var game = grasshopper.getGame();
 var socket = io.listen(app);
 var knownClients = [];
 
