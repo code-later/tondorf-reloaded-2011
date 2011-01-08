@@ -14,17 +14,18 @@
   <body>
     <script>
       // Creates canvas 320 × 200 at 10, 50
-      var world_size = 500;
+      var world_size = 1000;
       var paper = Raphael(10, 10, world_size, world_size);
       var c = paper.rect(0, 0, world_size, world_size);
       
       
       
-      function Monster(x, y, direction){
+      function Monster(name, x, y, direction){
         this.current_x = x;
         this.current_y = y;
         this.current_direction = direction;
         this.monster_set = paper.set();
+        this.name = name;
         
         this.move = function(x, y, direction) {
           path_to_animate_along = paper.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
@@ -46,13 +47,17 @@
               this.circle,
               this.dir_vec
           );
-          
           this.monster_set.rotate(Raphael.deg(direction), x, y); 
+          this.monster_set.push(
+              paper.text(x, y, this.name)
+          );
         }
                 
         this.init_monster_set();
       }
       
+      monster = new Monster("Andi", 50, 50, Raphael.rad(90));
+      monster.move(100,100, Raphael.rad(180));
       socket.connect();
       
       var active_players = {};
@@ -61,7 +66,7 @@
         // console.log(message);
         message.players.forEach(function (player){
           if(!active_players[player.id]){
-            active_players[player.id] = new Monster(player.position.x, player.position.y, player.direction);
+            active_players[player.id] = new Monster(player.name, player.position.x, player.position.y, player.direction);
           } else {
             active_players[player.id].move(player.position.x, player.position.y, player.direction);
           }
