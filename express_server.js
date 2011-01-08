@@ -10,6 +10,8 @@ app.configure(function() {
   app.set('view engine', 'ejs');
 });
 
+var knownClients = [];
+
 var world = {
   "clients" : {}
 }
@@ -18,12 +20,22 @@ app.get("/", function(req, res) {
   res.render("index", {"layout":false});
 });
 
+app.get("/world", function(req, res) {
+  res.writeHead(200, { "Content-Type" : "application/json"});
+  knownClients.push(res);
+  sys.puts("Registered.");
+});
+
 app.listen(3000);
 
 // socket.io 
 var socket = io.listen(app); 
 setInterval(function() {
   socket.broadcast(world);
+  var jsonWorld = JSON.stringify(world);
+  knownClients.forEach(function(res) {
+    res.write(jsonWorld);
+  });
 }, 1000);
 socket.on('connection', function(client){ 
   // new client is here! 
