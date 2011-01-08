@@ -48,7 +48,7 @@
         /// moving
         
         this.move = function(x, y, direction) {
-          this.draw_path(x,y,direction);
+          // this.draw_path(x,y,direction);
           this.animate_monster(x,y,direction);
           this.set_current_values(x,y,direction);
           console.log(this.name + " moved to "+this.current_x+"/"+this.current_y+" and looking to "+this.current_direction);
@@ -78,20 +78,20 @@
         // initialization
         
         this.init_monster_bg = function() {
-          this.monster_bg = paper.rect(x-(this.monster_image_width/2)-10, y-(this.monster_image_width/2)-12, 20, 24);
+          this.monster_bg = paper.rect(this.current_x-(this.monster_image_width/2)-10, this.current_y-(this.monster_image_width/2)-12, 20, 24);
           this.monster_bg.attr("fill", "red");
           this.monster_bg.attr("stroke", "white");
-          this.monster_bg.rotate(direction);
+          this.monster_bg.rotate(this.current_direction);
         }
         
         this.init_monster_img = function() {
-          this.monster_img = paper.image("panzer.png", x-(this.monster_image_width/2), y-(this.monster_image_width/2), this.monster_image_width, this.monster_image_width);
-          this.monster_img.rotate(direction);
+          this.monster_img = paper.image("panzer.png", this.current_x-(this.monster_image_width/2), this.current_y-(this.monster_image_width/2), this.monster_image_width, this.monster_image_width);
+          this.monster_img.rotate(this.current_direction);
         }
         
         this.init_monster_name = function() {
-          this.monster_name = paper.text(x, y, this.name);
-          this.monster_name.rotate(direction);
+          this.monster_name = paper.text(this.current_x, this.current_y, this.name);
+          this.monster_name.rotate(this.current_direction);
           this.monster_name.attr("fill", this.color);
           this.monster_name.attr("font", '14px "Arial"');
         }
@@ -100,7 +100,7 @@
           this.init_monster_bg();
           this.init_monster_img();
           this.init_monster_name();
-          this.move(this.current_x, this.current_y);
+          this.move(this.current_x, this.current_y, this.current_direction);
         }
         
         
