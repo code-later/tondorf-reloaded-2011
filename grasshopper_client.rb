@@ -11,45 +11,94 @@ class Grasshopper
   include HTTParty
   
   attr_accessor :world, :server
-
-  def self.join(server, nick, &block)
+  
+  def self.join(server, nick)
     game = new(server, nick)
-    Yajl::HttpStream.get(URI.parse("http://#{server}/world")) do |world|
-      game.world = world
-      game.instance_eval(&block)
-      game.update_player
+    if block_given?
+      Yajl::HttpStream.get(URI.parse("http://#{server}/world")) do |world|
+        game.world = world
+        game.instance_eval(yield)
+        game.update_player
+      end
     end
+    game
   end
 
   def initialize(server, nick)
     @player = {:nick => nick, :actions => {:thrust => false, :turnLeft => false, :turnRight => false, :fire => false}}
     @server = server
-    self.class.post("http://#{@server}/players/#{@player[:nick]}")
+    begin
+      self.class.post("http://#{@server}/players/#{@player[:nick]}")
+    rescue => e
+      puts "Could not connect to game-server"
+      raise e
+    end
   end
 
-  def run!
+  def join
+    Yajl::HttpStream.get(URI.parse("http://#{server}/world")) do |world|
+      self.world = world
+      think
+      update_player
+    end
+  end
+  
+  def run
     @player[:actions][:thrust] = true
   end
-  def stop!
+  
+  def running?
+    @player[:actions][:thrust]
+  end
+  
+  def stop
     @player[:actions][:thrust] = false
   end
-  def turn_left!
+  
+  def turn_left
     @player[:actions][:turn_left] = true
     @player[:actions][:turn_right] = false
   end
-  def turn_right!
+  
+  def turning_left?
+    @player[:actions][:turn_left]
+  end
+  
+  def turn_right
     @player[:actions][:turn_left] = false
     @player[:actions][:turn_right] = true
   end
-  def stop_turning!
+  
+  def turning_right?
+    @player[:actions][:turn_right]
+  end
+  
+  def turning?
+    turning_left? || turning_right?
+  end
+  
+  def stop_turning
     @player[:actions][:turn_left] = false
     @player[:actions][:turn_right] = false
   end
-  def shoot!
+  
+  def shoot
     @player[:actions][:shoot] = true
   end
-  def cease_fire!
+  
+  def shooting?
+    @player[:actions][:shoot]
+  end
+  
+  def cease_fire
     @player[:actions][:shoot] = false
+  end
+
+  %w(run stop turn_left turn_right stop_turning shoot cease_fire).each do |meth_name|
+    define_method "#{meth_name}!" do
+      send(meth_name)
+      update_player
+    end
   end
   
   def update_player
@@ -62,16 +111,21 @@ end
 
 # require "grashopper"
 
-Grasshopper.join("localhost:3000", "basti") do
-  world
-  
-  run!
-  # stop!
-  # 
-  turn_left!
-  # turn_right!
-  # stop_turning!
-  # 
-  # shoot!
-  # cease_fire!
-end
+# Grasshopper.join("localhost:3000", "andi1") do
+#   world
+#   
+#   run
+#   # stop!
+#   # 
+#   turn_left
+#   # turn_right!
+#   # stop_turning!
+#   # 
+#   # shoot!
+#   # cease_fire!
+# end
+
+# p = Grasshopper.join("localhost:3000", "andi2")
+# p.run!
+# p.stop!
+# p.turn_right!
