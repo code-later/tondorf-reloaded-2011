@@ -15,8 +15,13 @@
     <script>
       // Creates canvas 320 × 200 at 10, 50
       var world_size = 1000;
-      var paper = Raphael(10, 10, world_size, world_size);
-      var c = paper.rect(0, 0, world_size, world_size);
+      var game_field = Raphael(10, 10, world_size, world_size);
+      var c = game_field.rect(0, 0, world_size, world_size);
+      var score_board = Raphael(1020, 10, 300, 1000);
+      // var c = score_board.rect(0, 0, 300, 1000);
+      var active_players = {};
+      
+      
       
       function Monster(name, x, y, direction){
         this.monster_image_width = 30;
@@ -40,10 +45,10 @@
         this.current_x = x;
         this.current_y = y;
         this.current_direction = direction;
-        this.monster_set = paper.set();
+        this.monster_set = game_field.set();
         this.name = name;
-        this.color = possible_colors[Math.random(possible_colors.length)];
-        
+        this.color = possible_colors[parseInt(Math.random()*(possible_colors.length+1))];
+        this.log_debug = false;
         
         /// moving
         
@@ -51,21 +56,21 @@
           // this.draw_path(x,y,direction);
           this.animate_monster(x,y,direction);
           this.set_current_values(x,y,direction);
-          console.log(this.name + " moved to "+this.current_x+"/"+this.current_y+" and looking to "+this.current_direction);
+          if(this.log_debug){console.log(this.name + " moved to "+this.current_x+"/"+this.current_y+" and looking to "+this.current_direction);}
         }
         
         this.draw_path = function(x,y,direction) {
-          var path_to_animate_along = paper.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
+          var path_to_animate_along = game_field.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
         }
         
         this.animate_monster = function(x,y,direction) {
           if(this.current_direction!=direction) {
             this.monster_img.rotate(direction);
-            this.monster_bg.rotate(direction);
+            // this.monster_bg.rotate(direction);
           }
           this.monster_img.animate({x:(x-(this.monster_image_width/2)), y:(y-(this.monster_image_width/2))}, 100);
           this.monster_name.animate({x:x, y:y}, 100);
-          this.monster_bg.animate({x:x-(16/2), y:y-(24/2)}, 100);
+          // this.monster_bg.animate({x:x, y:y}, 100);
         }
         
         this.set_current_values = function(x,y,direction) {
@@ -78,26 +83,27 @@
         // initialization
         
         this.init_monster_bg = function() {
-          this.monster_bg = paper.rect(this.current_x-(this.monster_image_width/2)-10, this.current_y-(this.monster_image_width/2)-12, 20, 24);
-          this.monster_bg.attr("fill", "red");
+          // this.monster_bg = game_field.rect(this.current_x-(this.monster_image_width/2)-10, this.current_y-(this.monster_image_width/2)-12, 20, 24);
+          this.monster_bg = game_field.circle(this.current_x, this.current_y, 10);
+          this.monster_bg.attr({"fill": this.color});
           this.monster_bg.attr("stroke", "white");
-          this.monster_bg.rotate(this.current_direction);
+          // this.monster_bg.rotate(this.current_direction);
         }
         
         this.init_monster_img = function() {
-          this.monster_img = paper.image("panzer.png", this.current_x-(this.monster_image_width/2), this.current_y-(this.monster_image_width/2), this.monster_image_width, this.monster_image_width);
+          this.monster_img = game_field.image("panzer.png", this.current_x-(this.monster_image_width/2), this.current_y-(this.monster_image_width/2), this.monster_image_width, this.monster_image_width);
           this.monster_img.rotate(this.current_direction);
         }
         
         this.init_monster_name = function() {
-          this.monster_name = paper.text(this.current_x, this.current_y, this.name);
+          this.monster_name = game_field.text(this.current_x, this.current_y, this.name);
           this.monster_name.rotate(this.current_direction);
           this.monster_name.attr("fill", this.color);
           this.monster_name.attr("font", '14px "Arial"');
         }
         
         this.initial_draw = function() {
-          this.init_monster_bg();
+          // this.init_monster_bg();
           this.init_monster_img();
           this.init_monster_name();
           this.move(this.current_x, this.current_y, this.current_direction);
@@ -111,7 +117,7 @@
       //monster.move(100,100, Raphael.rad(180));
       socket.connect();
       
-      var active_players = {};
+      
       
       function updateWorld(message) {
         message.players.forEach(function (player){
@@ -122,6 +128,32 @@
             // console.log(player.direction);
           }
         });
+        updateScoreBoard();
+      }
+      
+      function updateScoreBoard() {
+        var x = 10;
+        var y = 10;
+        var has_players = false;
+        for (p in active_players) if (active_players.hasOwnProperty(p)) { has_players = true; break; };
+        if(has_players) {
+          score_board.clear();
+          for(player_id in active_players) {
+            player = active_players[player_id];
+            r = score_board.rect(x,y,100,20);
+            r.attr({stroke: player.color});
+            t = score_board.text(x+50,y+10,player.name);
+            t.attr("fill", this.color);
+            t.attr("font", '14px "Arial"');
+            s = score_board.text(x+160,y+10,player.score);
+            s.attr("fill", this.color);
+            s.attr("font", '16px "Arial"');
+            
+            y += 25;
+          }
+        } else {
+          score_board.text(x+30, y+10, "no players connected yet",100,20);
+        }
       }
     </script>
   </body>
