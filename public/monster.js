@@ -29,6 +29,7 @@ function Monster(name, x, y, direction){
   
   this.move = function(x, y, direction) {
     // this.draw_path(x,y,direction);
+    this.monster_img.show();
     this.animate_monster(x,y,direction);
     this.set_current_values(x,y,direction);
     if(this.log_debug){console.log(this.name + " moved to "+this.current_x+"/"+this.current_y+" and looking to "+this.current_direction);}
@@ -54,6 +55,11 @@ function Monster(name, x, y, direction){
     this.current_direction = direction;
   }
   
+  this.shotDown = function() {
+    this.monster_img.hide();
+    this.explosion_img.attr({x: this.current_x-(this.monster_image_width/2), y:this.current_y-(this.monster_image_width/2)});
+    this.explosion_img.show();
+  }
   
   // initialization
   
@@ -77,10 +83,16 @@ function Monster(name, x, y, direction){
     this.monster_name.attr("font", '14px "Arial"');
   }
   
+  this.init_explosion_img = function() {
+    this.explosion_img = game_field.image("explosion.png", this.current_x-(this.monster_image_width/2), this.current_y-(this.monster_image_width/2), this.monster_image_width, this.monster_image_width);
+    this.explosion_img.hide();
+  }
+  
   this.initial_draw = function() {
     // this.init_monster_bg();
     this.init_monster_img();
     this.init_monster_name();
+    this.init_explosion_img();
     this.move(this.current_x, this.current_y, this.current_direction);
   }
   
