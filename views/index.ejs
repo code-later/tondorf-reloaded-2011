@@ -2,16 +2,67 @@
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
     <title>Socket Server</title>
-    <script src="http://gambit.local:3000/socket.io/socket.io.js"></script> 
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/raphael.min.js"></script>
     <script> 
       var socket = new io.Socket(); 
-      var world;
       socket.on('connect', function() { console.log("Connection to server has been established.") }) 
-      socket.on('message', function(message) { world = message }) 
+      socket.on('message', function(message) { updateWorld(message); }) 
       socket.on('disconnect', function() { console.log("The connection has been closed!") }) 
     </script> 
   </head>
   <body>
-    :-)
+    <script>
+      // Creates canvas 320 × 200 at 10, 50
+      var world_size = 500;
+      var paper = Raphael(10, 10, world_size, world_size);
+      var c = paper.rect(0, 0, world_size, world_size);
+      
+      
+      
+      function Monster(x, y, direction){
+        this.current_x = x;
+        this.current_y = y;
+        this.current_direction = direction;
+        this.monster_set = paper.set();
+        
+        this.move = function(x, y, direction) {
+          path_to_animate_along = paper.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
+          path_to_animate_along.hide();
+          this.dir_vec.rotate(Raphael.deg(direction), this.current_x, this.current_y);
+          this.monster_set.animateAlong(path_to_animate_along, 500, false);
+          this.current_x = x;
+          this.current_y = y;
+          this.current_direction = direction;
+          console.log("moved to "+this.current_x+"/"+this.current_y+" and looking to "+Raphael.deg(this.current_direction));
+        }
+        
+        this.init_monster_set = function() {
+          this.circle = paper.circle(x, y, 10);
+          this.circle.attr("fill", "#f00");
+          this.circle.attr("stroke", "#fff");
+          this.dir_vec = paper.path("M"+x+" "+y+"L"+x+" "+(y-12));
+          this.monster_set.push(
+              this.circle,
+              this.dir_vec
+          );
+          
+          this.monster_set.rotate(Raphael.deg(direction), x, y); 
+        }
+                
+        this.init_monster_set();
+      }
+      
+      var monster = new Monster(30, 50, Raphael.rad(90));
+      
+      monster.move(100, 100, Raphael.rad(180));
+      
+      socket.connect();
+      
+      
+      function updateWorld(message) {
+        console.log(message);
+      }
+    </script>
   </body>
 </html>
