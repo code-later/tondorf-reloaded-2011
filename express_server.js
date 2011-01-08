@@ -50,7 +50,6 @@ app.put("/players/:name", function(req, res) {
 
     req.on("end", function() {
       actions = JSON.parse(body).actions;
-      console.log("setting actions to: " + sys.inspect(actions));
       player.newActions(actions);
       res.writeHead(200, { "Content-Type" : "application/json"});
       res.write(JSON.stringify({ "ok" : true }));

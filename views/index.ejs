@@ -45,7 +45,7 @@
         this.color = possible_colors[Math.random(possible_colors.length)];
         
         this.move = function(x, y, direction) {
-          var path_to_animate_along = paper.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
+          //var path_to_animate_along = paper.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
           // path_to_animate_along.hide();
           // direction = Raphael.deg(direction);
           if(this.current_direction!=direction) { this.monster_img.rotate(direction); }
@@ -54,7 +54,7 @@
           this.current_x = x;
           this.current_y = y;
           this.current_direction = direction;
-          console.log(this.name + " moved to "+this.current_x+"/"+this.current_y+" and looking to "+this.current_direction);
+          // console.log(this.name + " moved to "+this.current_x+"/"+this.current_y+" and looking to "+this.current_direction);
         }
         
         this.initial_draw = function() {
@@ -78,11 +78,11 @@
       
       function updateWorld(message) {
         message.players.forEach(function (player){
-          //console.log(player);
           if(!active_players[player.id]){
-            active_players[player.id] = new Monster(player.name, player.position.x, player.position.y, Raphael.deg(player.direction));
+            active_players[player.id] = new Monster(player.name, player.position.x, player.position.y, Raphael.deg(player.direction) + 90);
           } else {
-            active_players[player.id].move(player.position.x, player.position.y, Raphael.deg(player.direction));
+            active_players[player.id].move(player.position.x, player.position.y, Raphael.deg(player.direction) + 90);
+            // console.log(player.direction);
           }
         });
       }
