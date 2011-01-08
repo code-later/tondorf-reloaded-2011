@@ -27,16 +27,15 @@
       //monster.move(100,100, Raphael.rad(180));
       socket.connect();
       
-      function Shot(x, y, direction){
+      function Shot(x, y){
         this.current_x = x;
         this.current_y = y;
-        this.current_direction = direction;
         this.log_debug = false;
         
-        this.move = function(x, y, direction) {
-          this.animate_bullet(x,y,direction);
-          this.set_current_values(x,y,direction);
-          if(this.log_debug){console.log("shot moved to "+this.current_x+"/"+this.current_y+" and looking to "+this.current_direction);}
+        this.move = function(x, y) {
+          this.animate_bullet(x,y);
+          this.set_current_values(x,y);
+          if(this.log_debug){console.log("shot moved to "+this.current_x+"/"+this.current_y);}
         }
         
         this.set_current_values = function(x,y,direction) {
@@ -45,12 +44,17 @@
           this.current_direction = direction;
         }
         
-        this.animate_bullet = function(x, y, direction) {
-          this.bullet.animate({x:x, y:y}, 100);
+        this.animate_bullet = function(x, y) {
+          this.bullet.animate({cx:x, cy:y}, 100);
+        }
+        
+        this.remove_from_canvas = function() {
+          this.bullet.remove();
         }
         
         this.draw = function() {
           this.bullet = game_field.circle(this.current_x, this.current_y, 2);
+          this.bullet.attr("fill", "black");
         }
         
         this.draw();
@@ -65,13 +69,27 @@
           }
         });
         
-        message.shot_list.forEach(function (shot){
-          if(!active_shots[player.id]){
-            active_shots[shot.id] = new Shot(shot.position.x, shot.position.y, Raphael.deg(shot.direction) + 90);
-          } else {
-            active_shots[shot.id].move(shot.position.x, shot.position.y, Raphael.deg(shot.direction) + 90);
+        var shots_alive = {};
+        for(shotId in message.shotMap) {
+          if(message.shotMap.hasOwnProperty(shotId)){
+            shots_alive[shotId] = true;
+            shot = message.shotMap[shotId];
+            if(!active_shots[shotId]){
+              active_shots[shotId] = new Shot(shot.position.x, shot.position.y);
+            } else {
+              active_shots[shotId].move(shot.position.x, shot.position.y);
+            }
           }
-        });
+        }
+        
+        for (activeShotId in active_shots) {
+          if (active_shots.hasOwnProperty(activeShotId)) {
+            if(!shots_alive[activeShotId]){
+              active_shots[activeShotId].remove_from_canvas();
+              delete active_shots[activeShotId];
+            }
+          }
+        };
         
         
         updateScoreBoard();

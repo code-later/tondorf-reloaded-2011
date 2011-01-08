@@ -82,19 +82,19 @@ class Grasshopper
     @player[:actions][:turn_right] = false
   end
   
-  def shoot
-    @player[:actions][:shoot] = true
+  def fire
+    @player[:actions][:fire] = true
   end
   
-  def shooting?
-    @player[:actions][:shoot]
+  def fire?
+    @player[:actions][:fire]
   end
   
   def cease_fire
-    @player[:actions][:shoot] = false
+    @player[:actions][:fire] = false
   end
 
-  %w(run stop turn_left turn_right stop_turning shoot cease_fire).each do |meth_name|
+  %w(run stop turn_left turn_right stop_turning fire cease_fire).each do |meth_name|
     define_method "#{meth_name}!" do
       send(meth_name)
       update_player
