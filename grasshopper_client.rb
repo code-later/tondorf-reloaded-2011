@@ -56,21 +56,21 @@ class Grasshopper
   end
   
   def turn_left
-    @player[:actions][:turn_left] = true
-    @player[:actions][:turn_right] = false
+    @player[:actions][:turnLeft] = true
+    @player[:actions][:turnRight] = false
   end
   
   def turning_left?
-    @player[:actions][:turn_left]
+    @player[:actions][:turnLeft]
   end
   
   def turn_right
-    @player[:actions][:turn_left] = false
-    @player[:actions][:turn_right] = true
+    @player[:actions][:turnLeft] = false
+    @player[:actions][:turnRight] = true
   end
   
   def turning_right?
-    @player[:actions][:turn_right]
+    @player[:actions][:turnRight]
   end
   
   def turning?
@@ -78,8 +78,8 @@ class Grasshopper
   end
   
   def stop_turning
-    @player[:actions][:turn_left] = false
-    @player[:actions][:turn_right] = false
+    @player[:actions][:turnLeft] = false
+    @player[:actions][:turnRight] = false
   end
   
   def fire
