@@ -53,15 +53,19 @@
         this.init_monster_set();
       }
       
-      var monster = new Monster(30, 50, Raphael.rad(90));
-      
-      monster.move(100, 100, Raphael.rad(180));
-      
       socket.connect();
       
+      var active_players = {};
       
       function updateWorld(message) {
-        console.log(message);
+        // console.log(message);
+        message.players.forEach(function (player){
+          if(!active_players[player.id]){
+            active_players[player.id] = new Monster(player.position.x, player.position.y, player.direction);
+          } else {
+            active_players[player.id].move(player.position.x, player.position.y, player.direction);
+          }
+        });
       }
     </script>
   </body>
