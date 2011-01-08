@@ -11,7 +11,7 @@ class Grasshopper
   include HTTParty
   
   attr_accessor :world, :server
-
+  
   def self.join(server, nick)
     game = new(server, nick)
     if block_given?
@@ -35,27 +35,61 @@ class Grasshopper
     end
   end
 
+  def join
+    Yajl::HttpStream.get(URI.parse("http://#{server}/world")) do |world|
+      self.world = world
+      think
+      update_player
+    end
+  end
+  
   def run
     @player[:actions][:thrust] = true
   end
+  
+  def running?
+    @player[:actions][:thrust]
+  end
+  
   def stop
     @player[:actions][:thrust] = false
   end
+  
   def turn_left
     @player[:actions][:turn_left] = true
     @player[:actions][:turn_right] = false
   end
+  
+  def turning_left?
+    @player[:actions][:turn_left]
+  end
+  
   def turn_right
     @player[:actions][:turn_left] = false
     @player[:actions][:turn_right] = true
   end
+  
+  def turning_right?
+    @player[:actions][:turn_right]
+  end
+  
+  def turning?
+    turning_left? || turning_right?
+  end
+  
   def stop_turning
     @player[:actions][:turn_left] = false
     @player[:actions][:turn_right] = false
   end
+  
   def shoot
     @player[:actions][:shoot] = true
   end
+  
+  def shooting?
+    @player[:actions][:shoot]
+  end
+  
   def cease_fire
     @player[:actions][:shoot] = false
   end
