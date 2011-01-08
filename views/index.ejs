@@ -80,9 +80,9 @@
         message.players.forEach(function (player){
           //console.log(player);
           if(!active_players[player.id]){
-            active_players[player.id] = new Monster(player.name, player.position.x, player.position.y, player.direction);
+            active_players[player.id] = new Monster(player.name, player.position.x, player.position.y, Raphael.deg(player.direction));
           } else {
-            active_players[player.id].move(player.position.x, player.position.y, player.direction);
+            active_players[player.id].move(player.position.x, player.position.y, Raphael.deg(player.direction));
           }
         });
       }
