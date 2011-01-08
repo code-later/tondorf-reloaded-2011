@@ -25,11 +25,22 @@ function Monster(name, x, y, direction){
   this.color = possible_colors[parseInt(Math.random()*(possible_colors.length+1))];
   this.log_debug = false;
   
+  
+  this.show_monster = function() {
+    this.monster_name.show();
+    this.monster_img.show();
+  }
+  
+  this.hide_monster = function() {
+    this.monster_img.hide();
+    this.monster_name.hide();
+  }
+  
   /// moving
   
   this.move = function(x, y, direction) {
     // this.draw_path(x,y,direction);
-    this.monster_img.show();
+    this.show_monster();
     this.animate_monster(x,y,direction);
     this.set_current_values(x,y,direction);
     if(this.log_debug){console.log(this.name + " moved to "+this.current_x+"/"+this.current_y+" and looking to "+this.current_direction);}
@@ -56,9 +67,10 @@ function Monster(name, x, y, direction){
   }
   
   this.shotDown = function() {
-    this.monster_img.hide();
+    this.hide_monster();
     this.explosion_img.attr({x: this.current_x-(this.monster_image_width/2), y:this.current_y-(this.monster_image_width/2)});
     this.explosion_img.show();
+    this.explosion_img.animate({opacity: 0, scale:2}, 2000, "bounce");
   }
   
   // initialization
