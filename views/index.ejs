@@ -71,6 +71,7 @@
               active_players[player.id].move(player.position.x, player.position.y, Raphael.deg(player.direction) + 90);
             }
           }
+          active_players[player.id].score = player.score;
         });
         
         var shots_alive = {};

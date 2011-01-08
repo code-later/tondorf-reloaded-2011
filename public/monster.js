@@ -17,6 +17,7 @@ function Monster(name, x, y, direction){
     "#040",
     "#004"
   ];
+  this.score = 0;
   this.current_x = x;
   this.current_y = y;
   this.current_direction = direction;
