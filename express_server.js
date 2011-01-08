@@ -40,11 +40,12 @@ app.listen(3000);
 //var socket = io.listen(app);
 setInterval(function() {
   //socket.broadcast(game.world);
+  game.turn();
   var jsonWorld = JSON.stringify(game.world);
   knownClients.forEach(function(res) {
     res.write(jsonWorld);
   });
-}, 1000);
+}, grasshopper.WorldDefs.tick);
 //socket.on('connection', function(client){ 
   // new client is here! 
   //sys.puts("A new client just connected. Welcome it!")
