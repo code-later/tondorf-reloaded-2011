@@ -5,7 +5,7 @@ var app         = require('express').createServer(),
     grasshopper = require('./lib/grasshopper');
 
 var game = new grasshopper.Game();
-
+var socket = io.listen(app);
 var knownClients = [];
 
 app.configure(function() {
@@ -36,33 +36,18 @@ app.put("/players/:name", function(req, res) {
 
 app.listen(3000);
 
-// socket.io 
-//var socket = io.listen(app);
+socket.on('connection', function(client) { 
+  sys.puts("A new client just connected. Welcome it!")
+
+  client.on('message', function(message) {});
+  client.on('disconnect', function() {});
+});
+
 setInterval(function() {
-  //socket.broadcast(game.world);
   game.turn();
+  socket.broadcast(game.world);
   var jsonWorld = JSON.stringify(game.world);
   knownClients.forEach(function(res) {
     res.write(jsonWorld);
   });
 }, grasshopper.WorldDefs.tick);
-//socket.on('connection', function(client){ 
-  // new client is here! 
-  //sys.puts("A new client just connected. Welcome it!")
-
-  //client.on('message', function(message) {
-    //sys.puts("We got a message: " + message);
-    //switch(message.command) {
-      //case 'move':
-        //world.clients[client.sessionId]["x"] = message.x;
-        //world.clients[client.sessionId]["y"] = message.y;
-      //break;
-
-      //default:
-        //client.send("Your message is returned to you: " + message);
-    //}
-  //});
-  //client.on('disconnect', function() {
-    //sys.puts("Bye, bye!");
-  //});
-//});
