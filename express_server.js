@@ -1,7 +1,12 @@
-var app = require('express').createServer(),
-    io = require('socket.io'), // for npm, otherwise use require('./path/to/socket.io') 
-    sys = require('sys'),
-    express = require('express');
+var app         = require('express').createServer(),
+    io          = require('socket.io'), // for npm, otherwise use require('./path/to/socket.io')
+    sys         = require('sys'),
+    express     = require('express');
+    grasshopper = require('./lib/grasshopper');
+
+var game = new grasshopper.Game();
+
+var knownClients = [];
 
 app.configure(function() {
   app.use(app.router);
@@ -10,52 +15,53 @@ app.configure(function() {
   app.set('view engine', 'ejs');
 });
 
-var knownClients = [];
-
-var world = {
-  "clients" : {}
-}
-
 app.get("/", function(req, res) {
   res.render("index", {"layout":false});
 });
 
 app.get("/world", function(req, res) {
   res.writeHead(200, { "Content-Type" : "application/json"});
+  sys.puts("Registered client to consume world data.");
   knownClients.push(res);
-  sys.puts("Registered.");
+});
+
+app.put("/players/:name", function(req, res) {
+  var player = game.addPlayer({ip: req.headers.ip, name: req.params.name})
+  sys.puts("Added player: " + player.name);
+  res.writeHead(200, { "Content-Type" : "application/json"});
+  sys.puts("Current World: " + game.world);
+  res.write(JSON.stringify({"ok":true}));
+  res.end();
 });
 
 app.listen(3000);
 
 // socket.io 
-var socket = io.listen(app); 
+//var socket = io.listen(app);
 setInterval(function() {
-  socket.broadcast(world);
-  var jsonWorld = JSON.stringify(world);
+  //socket.broadcast(game.world);
+  var jsonWorld = JSON.stringify(game.world);
   knownClients.forEach(function(res) {
     res.write(jsonWorld);
   });
 }, 1000);
-socket.on('connection', function(client){ 
+//socket.on('connection', function(client){ 
   // new client is here! 
-  sys.puts("A new client just connected. Welcome it!")
+  //sys.puts("A new client just connected. Welcome it!")
 
-  world.clients[client.sessionId] = {"x" : 0, "y" : 0};
-  
-  client.on('message', function(message) {
-    sys.puts("We got a message: " + message);
-    switch(message.command) {
-      case 'move':
-        world.clients[client.sessionId]["x"] = message.x;
-        world.clients[client.sessionId]["y"] = message.y;
-      break;
+  //client.on('message', function(message) {
+    //sys.puts("We got a message: " + message);
+    //switch(message.command) {
+      //case 'move':
+        //world.clients[client.sessionId]["x"] = message.x;
+        //world.clients[client.sessionId]["y"] = message.y;
+      //break;
 
-      default:
-        client.send("Your message is returned to you: " + message);
-    }
-  });
-  client.on('disconnect', function() {
-    sys.puts("Bye, bye!");
-  });
-}); 
+      //default:
+        //client.send("Your message is returned to you: " + message);
+    //}
+  //});
+  //client.on('disconnect', function() {
+    //sys.puts("Bye, bye!");
+  //});
+//});
