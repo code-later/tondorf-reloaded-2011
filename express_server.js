@@ -16,7 +16,7 @@ app.configure(function() {
 });
 
 app.get("/", function(req, res) {
-  res.render("index", {"layout":false});
+  res.render("index", { "layout" : false });
 });
 
 app.get("/world", function(req, res) {
@@ -25,12 +25,31 @@ app.get("/world", function(req, res) {
   knownClients.push(res);
 });
 
+app.post("/players/:name", function(req, res) {
+  try {
+    var player = game.addPlayer({ip: req.headers.ip, name: req.params.name})
+    sys.puts("Added player: " + player.name);
+    res.writeHead(200, { "Content-Type" : "application/json"});
+    res.write(JSON.stringify({ "ok" : true }));
+  } catch(m) {
+    sys.puts(m);
+    res.writeHead(409, { "Content-Type" : "application/json"});
+    res.write(JSON.stringify({ "error" : m }));
+  }
+  res.end();
+});
+
 app.put("/players/:name", function(req, res) {
-  var player = game.addPlayer({ip: req.headers.ip, name: req.params.name})
-  sys.puts("Added player: " + player.name);
-  res.writeHead(200, { "Content-Type" : "application/json"});
-  sys.puts("Current World: " + game.world);
-  res.write(JSON.stringify({"ok":true}));
+  var player = game.findPlayer(req.params.name)
+
+  if (player) { 
+    player.actions = req.params.actions;
+    res.writeHead(200, { "Content-Type" : "application/json"});
+    res.write(JSON.stringify({ "ok" : true }));
+  } else {
+    res.writeHead(404, { "Content-Type" : "application/json"});
+    res.write(JSON.stringify({ "error" : "player not found: " + req.params.name }));
+  };
   res.end();
 });
 
@@ -50,4 +69,4 @@ setInterval(function() {
   knownClients.forEach(function(res) {
     res.write(jsonWorld);
   });
-}, grasshopper.WorldDefs.tick);
+}, grasshopper.WorldDefs.serverTick);

@@ -18,8 +18,6 @@
       var paper = Raphael(10, 10, world_size, world_size);
       var c = paper.rect(0, 0, world_size, world_size);
       
-      
-      
       function Monster(name, x, y, direction){
         this.current_x = x;
         this.current_y = y;
@@ -31,7 +29,7 @@
           path_to_animate_along = paper.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
           path_to_animate_along.hide();
           this.dir_vec.rotate(Raphael.deg(direction), this.current_x, this.current_y);
-          this.monster_set.animateAlong(path_to_animate_along, 500, false);
+          this.monster_set.animateAlong(path_to_animate_along, 100, false);
           this.current_x = x;
           this.current_y = y;
           this.current_direction = direction;
@@ -56,15 +54,15 @@
         this.init_monster_set();
       }
       
-      monster = new Monster("Andi", 50, 50, Raphael.rad(90));
-      monster.move(100,100, Raphael.rad(180));
+      //monster = new Monster("Andi", 50, 50, Raphael.rad(90));
+      //monster.move(100,100, Raphael.rad(180));
       socket.connect();
       
       var active_players = {};
       
       function updateWorld(message) {
-        // console.log(message);
         message.players.forEach(function (player){
+          //console.log(player);
           if(!active_players[player.id]){
             active_players[player.id] = new Monster(player.name, player.position.x, player.position.y, player.direction);
           } else {
