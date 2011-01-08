@@ -19,39 +19,52 @@
       var c = paper.rect(0, 0, world_size, world_size);
       
       function Monster(name, x, y, direction){
+        this.monster_image_width = 30;
+        var possible_colors = [
+          "#f00",
+          "#0f0",
+          "#00f",
+          "#a00",
+          "#0a0",
+          "#00a",
+          "#800",
+          "#080",
+          "#008",
+          "#600",
+          "#060",
+          "#006",
+          "#400",
+          "#040",
+          "#004"
+        ];
         this.current_x = x;
         this.current_y = y;
         this.current_direction = direction;
         this.monster_set = paper.set();
         this.name = name;
+        this.color = possible_colors[Math.random(possible_colors.length)];
         
         this.move = function(x, y, direction) {
-          path_to_animate_along = paper.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
-          path_to_animate_along.hide();
-          this.dir_vec.rotate(Raphael.deg(direction), this.current_x, this.current_y);
-          this.monster_set.animateAlong(path_to_animate_along, 100, false);
+          var path_to_animate_along = paper.path("M"+this.current_x+" "+this.current_y+"L"+x+" "+y);
+          // path_to_animate_along.hide();
+          if(this.current_direction!=direction) { this.monster_img.rotate(Raphael.deg(direction)); }
+          this.monster_img.animate({x:(x-(this.monster_image_width/2)), y:(y-(this.monster_image_width/2))}, 100);
           this.current_x = x;
           this.current_y = y;
           this.current_direction = direction;
           console.log("moved to "+this.current_x+"/"+this.current_y+" and looking to "+Raphael.deg(this.current_direction));
         }
         
-        this.init_monster_set = function() {
-          this.circle = paper.circle(x, y, 10);
-          this.circle.attr("fill", "#f00");
-          this.circle.attr("stroke", "#fff");
-          this.dir_vec = paper.path("M"+x+" "+y+"L"+x+" "+(y-12));
-          this.monster_set.push(
-              this.circle,
-              this.dir_vec
+        this.initial_draw = function() {
+          this.monster_img = paper.set();
+          this.monster_img.push(
+            paper.image("panzer.png", x-(this.monster_image_width/2), y-(this.monster_image_width/2), this.monster_image_width, this.monster_image_width),
+            paper.text(x, y, this.name)
           );
-          this.monster_set.rotate(Raphael.deg(direction), x, y); 
-          this.monster_set.push(
-              paper.text(x, y, this.name)
-          );
+          this.monster_img.rotate(Raphael.deg(direction));
         }
-                
-        this.init_monster_set();
+        
+        this.initial_draw();
       }
       
       //monster = new Monster("Andi", 50, 50, Raphael.rad(90));
