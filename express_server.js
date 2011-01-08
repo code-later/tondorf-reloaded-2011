@@ -40,23 +40,34 @@ app.post("/players/:name", function(req, res) {
 });
 
 app.put("/players/:name", function(req, res) {
-  var player = game.findPlayer(req.params.name)
+  var player = game.findPlayer(req.params.name);
 
   if (player) { 
-    player.actions = req.params.actions;
-    res.writeHead(200, { "Content-Type" : "application/json"});
-    res.write(JSON.stringify({ "ok" : true }));
+    var body = "";
+    req.on("data", function(data) {
+      body += data;
+    });
+
+    req.on("end", function() {
+      actions = JSON.parse(body).actions;
+      console.log("setting actions to: " + sys.inspect(actions));
+      player.newActions(actions);
+      res.writeHead(200, { "Content-Type" : "application/json"});
+      res.write(JSON.stringify({ "ok" : true }));
+      res.end();
+    });
   } else {
+    console.log("Player with name '" + req.params.name + "' couldn't be found.");
     res.writeHead(404, { "Content-Type" : "application/json"});
     res.write(JSON.stringify({ "error" : "player not found: " + req.params.name }));
+    res.end();
   };
-  res.end();
 });
 
 app.listen(3000);
 
 socket.on('connection', function(client) { 
-  sys.puts("A new client just connected. Welcome it!")
+  sys.puts("A new spectator just connected. Welcome it!")
 
   client.on('message', function(message) {});
   client.on('disconnect', function() {});

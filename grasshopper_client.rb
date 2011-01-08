@@ -1,15 +1,11 @@
 require "rubygems"
 require 'yajl'
 require 'yajl/http_stream'
-
-require "pp"
-
 require "httparty"
 
-# Yajl::HttpStream.get(URI.parse("http://gambit.local:3000/world")) do |frame|
-#   pp frame
-# end
+require "active_support/inflector"
 
+require "pp"
 
 class Grasshopper
   include HTTParty
@@ -26,7 +22,7 @@ class Grasshopper
   end
 
   def initialize(server, nick)
-    @player = {:nick => nick, :actions => {:thrust => false, :turn_left => false, :turn_right => false, :fire => false}}
+    @player = {:nick => nick, :actions => {:thrust => false, :turnLeft => false, :turnRight => false, :fire => false}}
     @server = server
     self.class.post("http://#{@server}/players/#{@player[:nick]}")
   end
@@ -57,7 +53,7 @@ class Grasshopper
   end
   
   def update_player
-    puts "Sending #{@player[:actions].inspect} to http://#{@server}/players/#{@player[:nick]}"
+    puts "Sending #{@player.inspect} to http://#{@server}/players/#{@player[:nick]}"
     self.class.put("http://#{@server}/players/#{@player[:nick]}", :body => Yajl::Encoder.encode(@player))
   end
 end
@@ -66,13 +62,13 @@ end
 
 # require "grashopper"
 
-Grasshopper.join("gambit.local:3000", "andi") do
+Grasshopper.join("gambit.local:3000", "basti") do
   world
   
   run!
   # stop!
   # 
-  # turn_left!
+  turn_left!
   # turn_right!
   # stop_turning!
   # 
