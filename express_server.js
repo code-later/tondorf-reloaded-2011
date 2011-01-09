@@ -63,6 +63,13 @@ app.put("/players/:name", function(req, res) {
   };
 });
 
+app.post("/reset", function(req, res) {
+  game = grasshopper.resetGame();
+  res.writeHead(200, { "Content-Type" : "application/json" });
+  res.write(JSON.stringify({ "ok" : true }));
+  res.end();
+});
+
 app.listen(3000);
 
 socket.on('connection', function(client) { 
